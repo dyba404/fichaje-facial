@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="es-PE">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>recon — kiosco demo</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100dvh; }
+  header { display: flex; align-items: baseline; gap: 12px; padding: 16px 24px; border-bottom: 1px solid #1e293b; }
+  h1 { font-size: 28px; margin: 0; letter-spacing: -0.02em; }
+  header small { color: #64748b; }
+  main { max-width: 980px; margin: 0 auto; padding: 24px; display: grid; gap: 20px; }
+  section { background: #1e293b; border-radius: 16px; padding: 20px; }
+  h2 { margin: 0 0 12px; font-size: 16px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; }
+  input, button { font: inherit; border-radius: 10px; border: 1px solid #334155; background: #0f172a; color: inherit; padding: 10px 14px; }
+  button { cursor: pointer; background: #2563eb; border: none; font-weight: 600; }
+  button.sec { background: #334155; }
+  button:disabled { opacity: 0.5; cursor: default; }
+  .kinds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0; }
+  .kinds button { padding: 18px; font-size: 18px; }
+  .kinds button[aria-pressed="true"] { background: #16a34a; }
+  video { width: 100%; max-width: 480px; border-radius: 12px; background: #000; transform: scaleX(-1); }
+  #estado { font-size: 20px; min-height: 28px; }
+  .ok { color: #4ade80; } .warn { color: #fbbf24; } .err { color: #f87171; }
+  #resultado { border-radius: 12px; padding: 16px; font-size: 22px; }
+  #resultado.ok { background: #14532d; } #resultado.bad { background: #7f1d1d; } #resultado.gray { background: #334155; }
+  #resultado img { margin-top: 10px; max-width: 200px; border-radius: 8px; transform: scaleX(-1); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  ul#feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  ul#feed li { display: flex; gap: 12px; align-items: center; background: #0f172a; padding: 8px 12px; border-radius: 10px; }
+  ul#feed img { width: 44px; height: 44px; object-fit: cover; border-radius: 8px; transform: scaleX(-1); }
+  ul#feed time { color: #64748b; font-size: 13px; margin-left: auto; }
+  details summary { cursor: pointer; color: #94a3b8; }
+  details form { display: grid; gap: 10px; margin-top: 12px; }
+  code { background: #0f172a; padding: 2px 6px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>recon</h1><small>kiosco demo · change 0001 · Fase 4 (borrador)</small>
+  <span id="conn" style="margin-left:auto" class="warn">sin sesión</span>
+</header>
+<main>
+  <section id="loginSec">
+    <h2>1 · Entra como admin (demo)</h2>
+    <div class="row">
+      <input id="email" type="email" value="admin@recon.local" size="24" />
+      <input id="pass" type="password" value="recon-admin-2026" size="20" />
+      <button id="btnLogin">Entrar</button>
+    </div>
+    <p style="color:#64748b">Credenciales del seed. La sesión es una cookie httpOnly: nunca toca el JavaScript.</p>
+  </section>
+
+  <section id="kiosco" hidden>
+    <h2>2 · Marcaje</h2>
+    <div class="row">
+      <video id="cam" autoplay playsinline muted width="480" height="360"></video>
+      <div>
+        <div class="kinds" id="kinds">
+          <button data-kind="in" aria-pressed="true">Entrada</button>
+          <button data-kind="out" aria-pressed="false">Salida</button>
+          <button data-kind="break_start" aria-pressed="false">Inicio refrigerio</button>
+          <button data-kind="break_end" aria-pressed="false">Fin refrigerio</button>
+        </div>
+        <div id="estado">Esperando cámara…</div>
+        <div class="row">
+          <button id="btnCara">Marcar con mi cara</button>
+          <button id="btnPinMode" class="sec">Usar PIN</button>
+        </div>
+        <div class="row" id="pinRow" hidden>
+          <input id="pin" inputmode="numeric" pattern="[0-9]*" size="6" placeholder="PIN" />
+          <button id="btnPin">Marcar con PIN</button>
+        </div>
+      </div>
+    </div>
+    <div id="resultado" hidden></div>
+  </section>
+
+  <section id="enrolarSec" hidden>
+    <details>
+      <summary>3 · Enrolar a una persona con la cámara (5 fotos)</summary>
+      <form id="formEnrolar">
+        <div class="row">
+          <input id="eNombre" placeholder="Nombre completo" size="24" required />
+          <input id="eDni" placeholder="DNI (8 dígitos)" size="14" required />
+          <input id="ePin" placeholder="PIN (4-6 dígitos)" size="12" required />
+        </div>
+        <div class="row"><button type="submit">Capturar 5 fotos y enrolar</button><span id="eEstado"></span></div>
+      </form>
+    </details>
+  </section>
+
+  <section>
+    <h2>Marcajes en vivo (SSE)</h2>
+    <ul id="feed"><li style="color:#64748b">aún sin eventos…</li></ul>
+  </section>
+</main>
+
+<script type="module">
+const $ = (id) => document.getElementById(id);
+let kind = "in";
+let deviceKey = null;
+
+const setEstado = (txt, cls = "") => { $("estado").innerHTML = `<span class="${cls}">${txt}</span>`; };
+const api = (path, opts = {}) => fetch(path, { credentials: "same-origin", ...opts });
+
+for (const b of $("kinds").querySelectorAll("button")) {
+  b.onclick = () => {
+    kind = b.dataset.kind;
+    for (const x of $("kinds").querySelectorAll("button")) x.setAttribute("aria-pressed", String(x === b));
+  };
+}
+
+$("btnLogin").onclick = async () => {
+  const res = await api("/auth/login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: $("email").value, password: $("pass").value }) });
+  if (!res.ok) { $("conn").textContent = "login falló"; $("conn").className = "err"; return; }
+  $("conn").textContent = "conectado"; $("conn").className = "ok";
+  $("loginSec").hidden = true; $("kiosco").hidden = false; $("enrolarSec").hidden = false;
+  const me = (await api("/auth/me")).json();
+
+  // dispositivo para el kiosco (uno por sesión; revocable desde la API)
+  const sites = await (await api("/sites")).json();
+  let site = sites.find((s) => s.active) ?? sites[0];
+  const dev = await (await api("/devices", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: `Kiosco demo ${new Date().toLocaleTimeString("es-PE")}`, siteId: site.id }) })).json();
+  deviceKey = dev.apiKey;
+
+  const es = new EventSource("/events");
+  es.onmessage = (ev) => { const item = JSON.parse(ev.data); feedItem(item); };
+  setEstado(`Hola ${me.email} — cámara lista cuando la veas.`, "ok");
+  startCam();
+};
+
+let stream = null;
+async function startCam() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: false });
+    $("cam").srcObject = stream;
+    setEstado("Cámara lista. Elige el tipo y márcate.", "ok");
+  } catch (e) {
+    setEstado("Cámara no disponible: " + e.message + " — usa el PIN de respaldo.", "warn");
+    $("pinRow").hidden = false;
+  }
+}
+
+function capture() {
+  const v = $("cam");
+  const c = document.createElement("canvas");
+  c.width = v.videoWidth || 640; c.height = v.videoHeight || 480;
+  c.getContext("2d").drawImage(v, 0, 0);
+  return new Promise((ok) => c.toBlob(ok, "image/jpeg", 0.85));
+}
+
+function showResultado(html, cls) {
+  const r = $("resultado");
+  r.hidden = false; r.className = cls; r.innerHTML = html;
+}
+
+$("btnCara").onclick = async () => {
+  if (!stream) return setEstado("sin cámara — usa PIN", "warn");
+  setEstado("Reconociendo…");
+  const blob = await capture();
+  const fd = new FormData();
+  fd.append("frame", blob, "frame.jpg");
+  fd.append("kind", kind);
+  const t0 = performance.now();
+  const res = await fetch("/marks/recognize", { method: "POST", headers: { authorization: `Device ${deviceKey}` }, body: fd });
+  const body = await res.json();
+  const ms = Math.round(performance.now() - t0);
+  if (body.status === "recognized") {
+    showResultado(`✅ ¡Hola, ${body.employeeName}! ${kindLabel(kind)} registrada.<br><small>similitud ${body.similarity.toFixed(3)} · ${body.latencyMs} ms (total ${ms} ms)</small>`, "ok");
+  } else if (body.status === "capture_error") {
+    showResultado(`📷 No se vio una sola cara (${body.latencyMs} ms). Acércate y mira a la cámara.`, "gray");
+  } else {
+    showResultado(`🤔 No te reconocí${body.ambiguous ? " (hay parecidos)" : ""}. Usa tu PIN.<br><small>mejor similitud ${body.similarity?.toFixed(3) ?? "—"} · umbral 0.38</small>`, "bad");
+    $("pinRow").hidden = false;
+  }
+  setEstado("Listo", "ok");
+};
+
+$("btnPinMode").onclick = () => { $("pinRow").hidden = !$("pinRow").hidden; };
+$("btnPin").onclick = async () => {
+  const blob = await capture();
+  const fd = new FormData();
+  fd.append("frame", blob, "evidencia.jpg");
+  fd.append("payload", JSON.stringify({ pin: $("pin").value, kind }));
+  const res = await fetch("/marks/pin", { method: "POST", headers: { authorization: `Device ${deviceKey}` }, body: fd });
+  if (res.status === 401) return showResultado("❌ PIN inválido (quedó la foto como evidencia del intento)", "bad");
+  const body = await res.json();
+  showResultado(`✅ Marcaje por PIN: ${body.employeeName}<br><small><a href="${body.evidenceUrl}" target="_blank">ver evidencia</a></small>`, "ok");
+};
+
+$("formEnrolar").onsubmit = async (ev) => {
+  ev.preventDefault();
+  $("eEstado").textContent = "creando empleado…";
+  const sites = await (await api("/sites")).json();
+  const created = await api("/employees", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ fullName: $("eNombre").value, docNumber: $("eDni").value, siteId: sites[0].id, pin: $("ePin").value, consent: true }) });
+  if (!created.ok) { $("eEstado").textContent = "error: " + JSON.stringify(await created.json()); return; }
+  const emp = await created.json();
+  const fotos = [];
+  for (let i = 1; i <= 5; i++) {
+    $("eEstado").textContent = `foto ${i}/5 — mueve un poco la cabeza…`;
+    fotos.push(await capture());
+    await new Promise((r) => setTimeout(r, 900));
+  }
+  const fd = new FormData();
+  fotos.forEach((b, i) => fd.append("photos", b, `foto-${i}.jpg`));
+  $("eEstado").textContent = "generando embeddings…";
+  const up = await fetch(`/employees/${emp.id}/face-samples`, { method: "POST", body: fd });
+  const upBody = await up.json();
+  const okCount = upBody.results.filter((r) => r.ok).length;
+  if (okCount < 5) { $("eEstado").innerHTML = `<span class="err">solo ${okCount}/5 fotos válidas — reintenta</span>`; return; }
+  const fin = await fetch(`/employees/${emp.id}/face-samples/finalize`, { method: "POST" });
+  $("eEstado").innerHTML = fin.ok ? `<span class="ok">✅ ${emp.fullName} enrolado — ya puedes marcarte con la cara</span>` : "error en finalize";
+};
+
+const kindLabel = (k) => ({ in: "Entrada", out: "Salida", break_start: "Inicio de refrigerio", break_end: "Fin de refrigerio" })[k];
+function feedItem(item) {
+  const li = document.createElement("li");
+  li.innerHTML = `<img src="${item.evidenceUrl}" alt="" /><span><b>${item.employeeName}</b> · ${kindLabel(item.kind)} · ${item.method}${item.isOffline ? " · offline" : ""}</span><time>${new Date(item.occurredAt).toLocaleTimeString("es-PE")}</time>`;
+  $("feed").prepend(li);
+  const empty = $("feed").querySelector("li[style]");
+  if (empty) empty.remove();
+}
+</script>
+</body>
+</html>
