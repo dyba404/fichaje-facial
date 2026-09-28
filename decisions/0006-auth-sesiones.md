@@ -20,6 +20,7 @@ Dos planos de identidad: (1) usuarios del dashboard — admin y supervisor (role
 
 ## Consecuencias
 
-+ Revocación inmediata (borrar sesión/clave), sin librerías de blacklist.
++ Revocación inmediata de **device API keys** (borrar la fila en BD).
 + La foto de evidencia solo se sirve por endpoint autenticado con rol — nunca estática.
 − Mismo origen o proxy en dev (Vite proxy a :3000) para que la cookie funcione; documentado en setup.
+− **Hallazgo verificado en tests (2026-09-28):** la cookie de sesión es *stateless* — `logout` vacía la cookie del cliente, pero una cookie vieja ya emitida sigue siendo válida hasta expirar. Suficiente para MVP en LAN; la revocación server-side de sesiones (tabla de sesiones) queda en el endurecimiento de producción (task 3.5 del change 0001).

@@ -2,7 +2,7 @@
 
 Workspace **armado para construir el proyecto con IA** (SDD + skills), no para construir a mano. El producto: fichaje facial para PYMEs peruanas — kiosco de marcaje en navegador + backend propio con pipeline de visión artificial real (SCRFD → ArcFace) + dashboard. "El reloj eres tú": cero hardware frente al ZKTeco, anti-fraude visible.
 
-Estado actual: **diseño y plan de trabajo listos, nada construido todavía.** El change 0001 tiene design.md + 7 ADRs + tasks.md (35 tareas en 8 fases). Sigue `/build 0001-mvp-fichaje-reconocimiento`.
+Estado actual: **/build en marcha** — Fase 0 completa (monorepo, BD pgvector, modelos, contrato) y pipeline de visión verificado (tasks 1.1-1.5: auto-similitud 1.0000, personas distintas 0.1685, 100 ms e2e). Pendiente del dueño: tarea 0.6 (fotos reales para fixtures). Sigue `/build 0001-mvp-fichaje-reconocimiento`.
 
 ## Mapa del workspace
 
