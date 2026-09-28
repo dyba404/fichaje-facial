@@ -24,7 +24,12 @@ export class VisionClient {
   static async create(modelsDir?: string): Promise<VisionClient> {
     const client = new VisionClient();
     const workerPath = join(dirname(fileURLToPath(import.meta.url)), "worker.ts");
-    client.worker = new Worker(workerPath, { workerData: { modelsDir } });
+    // --import tsx: el worker es .ts y debe cargarse con el loader de tsx
+    // tanto bajo tsx (API) como bajo vitest (tests).
+    client.worker = new Worker(workerPath, {
+      workerData: { modelsDir },
+      execArgv: ["--import", "tsx"],
+    });
 
     const ready = new Promise<void>((resolve, reject) => {
       client.worker.once("message", (m: { type: string; error?: string }) => {

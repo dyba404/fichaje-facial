@@ -59,3 +59,27 @@ export async function login(
   if (res.statusCode !== 200) throw new Error(`login falló (${res.statusCode}): ${res.body}`);
   return Object.fromEntries(res.cookies.map((c) => [c.name, c.value]));
 }
+
+/** Cuerpo multipart manual (sin depender de FormData de inject). */
+export function multipart(
+  parts: Array<{ name: string; filename?: string; type?: string; data: Buffer }>,
+): { payload: Buffer; headers: Record<string, string> } {
+  const boundary = "----recon-test-" + Math.random().toString(16).slice(2);
+  const chunks: Buffer[] = [];
+  for (const p of parts) {
+    chunks.push(
+      Buffer.from(
+        `--${boundary}\r\nContent-Disposition: form-data; name="${p.name}"` +
+          (p.filename ? `; filename="${p.filename}"` : "") +
+          `\r\nContent-Type: ${p.type ?? "application/octet-stream"}\r\n\r\n`,
+      ),
+    );
+    chunks.push(p.data);
+    chunks.push(Buffer.from("\r\n"));
+  }
+  chunks.push(Buffer.from(`--${boundary}--\r\n`));
+  return {
+    payload: Buffer.concat(chunks),
+    headers: { "content-type": `multipart/form-data; boundary=${boundary}` },
+  };
+}

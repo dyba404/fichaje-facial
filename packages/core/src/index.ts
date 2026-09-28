@@ -90,6 +90,8 @@ export const EmployeeCreate = z.object({
   pin: Pin.optional(),
   shiftStart: HhMm.default("09:00"),
   shiftEnd: HhMm.default("18:00"),
+  /** consentimiento explícito para tratamiento de datos biométricos (constitution §5) */
+  consent: z.literal(true),
 });
 export type EmployeeCreate = z.infer<typeof EmployeeCreate>;
 

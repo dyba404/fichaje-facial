@@ -1,8 +1,11 @@
 import Fastify from "fastify";
+import multipart from "@fastify/multipart";
 import { createDb, type Database } from "./db/client";
 import { registerSession } from "./auth";
 import { authRoutes } from "./routes/auth";
 import { siteRoutes } from "./routes/sites";
+import { employeeRoutes } from "./routes/employees";
+import { closeVision } from "./vision";
 
 export async function buildApp(opts: { db?: Database } = {}) {
   const db = opts.db ?? createDb().db;
@@ -12,6 +15,7 @@ export async function buildApp(opts: { db?: Database } = {}) {
   });
 
   registerSession(app);
+  await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024, files: 20 } });
 
   app.get("/healthz", async () => ({
     ok: true,
@@ -27,6 +31,11 @@ export async function buildApp(opts: { db?: Database } = {}) {
 
   await app.register(authRoutes(db));
   await app.register(siteRoutes(db));
+  await app.register(employeeRoutes(db));
+
+  app.addHook("onClose", async () => {
+    await closeVision();
+  });
 
   return { app, db };
 }
