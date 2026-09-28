@@ -1,0 +1,36 @@
+{
+  "name": "recon",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sistema de fichaje con reconocimiento facial para PYMEs peruanas",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev:api": "npm run dev -w @recon/api",
+    "dev:kiosk": "npm run dev -w @recon/kiosk",
+    "dev:dashboard": "npm run dev -w @recon/dashboard",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "models:download": "powershell -ExecutionPolicy Bypass -File scripts/download-models.ps1"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true,
+    "onnxruntime-node@1.30.0": true,
+    "sharp@0.34.5": true
+  }
+}

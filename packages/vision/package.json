@@ -1,0 +1,20 @@
+{
+  "name": "@recon/vision",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pipeline de visión artificial de recon: SCRFD → alineación 112×112 → ArcFace 512-d → coseno (onnxruntime-node)",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "onnxruntime-node": "^1.30.0",
+    "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

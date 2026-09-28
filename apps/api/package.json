@@ -1,0 +1,26 @@
+{
+  "name": "@recon/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Backend de recon: Fastify + Drizzle + pipeline de visión",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@recon/core": "*",
+    "@recon/vision": "*",
+    "drizzle-orm": "^0.44.0",
+    "fastify": "^5.3.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.15.0",
+    "drizzle-kit": "^0.31.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

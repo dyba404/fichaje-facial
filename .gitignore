@@ -1,0 +1,24 @@
+# dependencias y builds
+node_modules/
+dist/
+coverage/
+
+# modelos (peso + licencia no-comercial ADR-0002) y datos locales (privacidad constitution §5)
+models/
+data/
+apps/api/test/fixtures/
+
+# entorno
+.env
+.env.*
+
+# sistema / IDE
+.DS_Store
+Thumbs.db
+*.log
+
+# screenshots temporales del QA de navegador
+_shot-*.png
+
+# repos de referencia: solo lectura, tienen su propio git
+repos-ref/
