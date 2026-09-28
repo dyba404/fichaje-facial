@@ -5,6 +5,10 @@ import { registerSession } from "./auth";
 import { authRoutes } from "./routes/auth";
 import { siteRoutes } from "./routes/sites";
 import { employeeRoutes } from "./routes/employees";
+import { deviceRoutes } from "./routes/devices";
+import { markRoutes } from "./routes/marks";
+import { eventRoutes } from "./routes/events";
+import { evidenceRoutes } from "./routes/evidence";
 import { closeVision } from "./vision";
 
 export async function buildApp(opts: { db?: Database } = {}) {
@@ -32,6 +36,10 @@ export async function buildApp(opts: { db?: Database } = {}) {
   await app.register(authRoutes(db));
   await app.register(siteRoutes(db));
   await app.register(employeeRoutes(db));
+  await app.register(deviceRoutes(db));
+  await app.register(markRoutes(db));
+  await app.register(eventRoutes(db));
+  await app.register(evidenceRoutes(db));
 
   app.addHook("onClose", async () => {
     await closeVision();

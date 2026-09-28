@@ -170,7 +170,9 @@ export const MarkingResult = z.object({
 export type MarkingResult = z.infer<typeof MarkingResult>;
 
 /** POST /marks/sync — cola offline del kiosco (REQ-MAR-03). Solo método PIN:
- *  el reconocimiento facial es server-side y no puede correr sin red. */
+ *  el reconocimiento facial es server-side y no puede correr sin red.
+ *  Cada item lleva su foto de evidencia (constitution §4: todo marcaje
+ *  guarda foto — también offline). */
 export const SyncRequest = z.object({
   items: z
     .array(
@@ -179,6 +181,8 @@ export const SyncRequest = z.object({
         kind: MarkingKind,
         clientTime: IsoDatetime,
         livenessScores: LivenessScores.optional(),
+        /** filename del archivo multipart con la foto de evidencia del item */
+        photo: z.string().optional(),
       }),
     )
     .min(1)

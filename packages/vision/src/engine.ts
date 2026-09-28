@@ -25,6 +25,8 @@ export interface RecognizeHit {
 
 export interface RecognizeOutcome {
   face: Face | null;
+  /** caras detectadas en el frame: 0 o ≥2 ⇒ capture_error (REQ-REC-03) */
+  faceCount: number;
   /** embedding L2 del rostro alineado (null si no hay cara) */
   embedding: Float32Array | null;
   /** mejor y segundo mejor del gallery (para la regla de ambigüedad) */
@@ -132,18 +134,17 @@ export class VisionEngine {
     const raw = await this.decode(image);
     const faces = await this.detectFromRaw(raw);
     const face = faces[0] ?? null;
-    if (!face) return { face: null, embedding: null, best: null, second: null };
+    if (!face) return { face: null, faceCount: faces.length, embedding: null, best: null, second: null };
 
     const embedding = await this.embedFromRaw(raw, face);
-    const hits = gallery
+    // ranking por similitud; el "segundo" para la regla de ambigüedad es el
+    // mejor hit de OTRA persona (varios vectores del mismo empleado no cuentan)
+    const ranked = gallery
       .map((g) => ({ id: g.id, similarity: dot(embedding, g.vector) }))
       .sort((a, b) => b.similarity - a.similarity);
-    return {
-      face,
-      embedding,
-      best: hits[0] ?? null,
-      second: hits[1] ?? null,
-    };
+    const best = ranked[0] ?? null;
+    const second = best ? (ranked.find((h) => h.id !== best.id) ?? null) : null;
+    return { face, faceCount: faces.length, embedding, best, second };
   }
 }
 
