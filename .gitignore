@@ -22,3 +22,7 @@ _shot-*.png
 
 # repos de referencia: solo lectura, tienen su propio git
 repos-ref/
+
+# tooling de agente local (skills, planes): no forman parte del proyecto
+.zcode/
+.opencode/

@@ -53,4 +53,5 @@ Cada skill sabe dónde vive lo que necesita (`templates/`, `decisions/`, `resear
 - `/build 0001-mvp-fichaje-reconocimiento` — arranca por la Fase 0 (**siguiente paso**). Necesita: Docker instalado y corriendo, y tu participación en la tarea 0.6 (10-15 fotos reales para fixtures).
 - ADR-0002 (modelo facial, hoy en Propuesta) se ratifica al arrancar /build: los modelos se descargan en la tarea 0.4.
 - `DESIGN.md` se crea en la fase de UI (con `taste` + `impeccable init`), no antes.
+- **UI aún no existe:** `apps/kiosk` y `apps/dashboard` son hoy stubs de ~21 líneas (pantalla placeholder); la UI real es la Fase 4. Por ahora el producto se ve en la página `/demo` servida por la API.
 - Si Jev entra en v2: verificar precio/SLA de la API y existencia de SDK Node (research/jev-typesafe-ai.md).
