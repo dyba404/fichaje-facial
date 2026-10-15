@@ -1,7 +1,7 @@
 # ADR-0006: Autenticación y sesiones — cookie httpOnly + argon2id; kiosco por device API key
 
 - Estado: Aceptada (2026-09-28, /plan del change 0001)
-- Decide: agente (ratificado por el dueño al aprobar el design)
+- Decide: aprobado por el dueño del producto
 
 ## Contexto
 

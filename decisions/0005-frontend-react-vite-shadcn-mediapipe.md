@@ -1,7 +1,7 @@
 # ADR-0005: Frontend — React 19 + Vite + shadcn/ui; kiosco con MediaPipe Tasks Vision
 
 - Estado: Aceptada (2026-09-28, /plan del change 0001)
-- Decide: agente (ratificado por el dueño al aprobar el design)
+- Decide: aprobado por el dueño del producto
 
 ## Contexto
 

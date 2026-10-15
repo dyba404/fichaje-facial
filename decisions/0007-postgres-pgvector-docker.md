@@ -1,7 +1,7 @@
 # ADR-0007: Postgres 16 + pgvector vía docker-compose (fallback: Postgres embebido)
 
 - Estado: Aceptada (2026-09-28, /plan del change 0001 — el dueño confirmó Postgres+pgvector en /clarify y reportó Docker en instalación)
-- Decide: humano (con análisis del agente)
+- Decide: humano
 
 ## Contexto
 

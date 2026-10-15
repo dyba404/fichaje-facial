@@ -1,7 +1,7 @@
 # ADR-0003: Backend — Fastify + TypeScript strict + Drizzle ORM
 
 - Estado: Aceptada (2026-09-28, /plan del change 0001)
-- Decide: agente (ratificado por el dueño al aprobar el design)
+- Decide: aprobado por el dueño del producto
 
 ## Contexto
 
@@ -24,4 +24,4 @@ ADR-0001 fijó Node + onnxruntime para el CV; quedaba decidir framework, lenguaj
 
 + Contrato único `packages/core` consumido por api, kiosk y dashboard (menos drift).
 + SSE vía plugin (fastify-sse-v2) sin WebSockets.
-− Curva menor de plugins Fastify frente a Express para el agente builder; mitigado con docs en el repo.
+− Curva menor de plugins Fastify frente a Express; mitigado con docs en el repo.

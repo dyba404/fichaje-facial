@@ -2,7 +2,7 @@
 
 - Estado: **Aceptada** (ratificada en /clarify del change 0001, 2026-09-28: Postgres+pgvector confirmado; la opción SQLite fue ofrecida y descartada)
 - Fecha: 2026-09-28
-- Decide: humano. El agente solo aporta este análisis (fundamento completo en `research/repos-y-vision.md`).
+- Decide: humano (fundamento completo en `research/repos-y-vision.md`).
 
 ## Contexto
 
