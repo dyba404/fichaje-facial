@@ -5,11 +5,11 @@
 
 ## Contexto
 
-Dos frontends: dashboard admin (KPIs, feed en vivo, tablas, ABM) y kiosco de marcaje (cámara + liveness + botones grandes). Son apps privadas (LAN / tablet del local), no sites públicos. Las skills de diseño del workspace (impeccable, shadcn, taste, animate) están alineadas a React/Tailwind/shadcn.
+Dos frontends: dashboard admin (KPIs, feed en vivo, tablas, ABM) y kiosco de marcaje (cámara + liveness + botones grandes). Son apps privadas (LAN / tablet del local), no sites públicos, alineadas a React/Tailwind/shadcn.
 
 ## Decisión
 
-- **Dashboard:** React 19 + Vite + Tailwind + shadcn/ui + recharts. Layout del shadcn dashboard example como base; DESIGN.md propio se creará en fase de UI con `taste` + `impeccable`.
+- **Dashboard:** React 19 + Vite + Tailwind + shadcn/ui + recharts. Layout del shadcn dashboard example como base; DESIGN.md propio se creará en la fase de UI.
 - **Kiosco:** React 19 + Vite; **MediaPipe Tasks Vision (Apache-2.0) self-hosted** (wasm/tflite servidos local, sin CDN — debe funcionar offline): `blaze_face_short_range` para encuadre en vivo y FaceLandmarker con blendshapes para el liveness activo (parpadeo + yaw). El backend re-verifica detección con SCRFD; el cliente nunca decide la identidad.
 
 ## Alternativas consideradas

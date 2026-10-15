@@ -1,6 +1,6 @@
 # Investigación: Reconocimiento facial para fichaje — repos, pipeline, liveness y stack (2026-09)
 
-Para qué sirve: fundamenta el ADR-0001 (stack de visión artificial) y la skill `face-recog`. Informe crudo de investigación, no tocar como parte del loop.
+Para qué sirve: fundamenta el ADR-0001 (stack de visión artificial). Informe crudo de investigación.
 
 RESTRICCIÓN DE ENTORNO: Windows, **sin Python** (solo stub de la Store), Node v24, git, cámara web, demo en oficina.
 

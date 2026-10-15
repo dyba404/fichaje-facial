@@ -1,6 +1,6 @@
 # docs/entorno — Bitácora de fixes de entorno
 
-Carpeta aparte del loop SDD para documentar problemas de la **máquina de desarrollo** (no del producto): qué pasó, cómo se diagnosticó, qué bugs se encontraron y qué fix se aplicó, con evidencia real.
+Documenta problemas de la **máquina de desarrollo** (no del producto): qué pasó, cómo se diagnosticó, qué bugs se encontraron y qué fix se aplicó, con evidencia real.
 
 Convención: un archivo por caso, `YYYY-MM-DD-tema.md`, en español, con comandos y salidas reales copiadas (no reconstruidas).
 
